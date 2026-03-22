@@ -1,0 +1,162 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --primary: #006B58;
+    --primary-container: #00A68A;
+    --on-primary: #ffffff;
+    --surface: #F8F9FF;
+    --surface-low: #F0F4F8;
+    --surface-lowest: #E8EEF4;
+    --surface-bright: #ffffff;
+    --surface-highest: #DCE4EC;
+    --on-surface: #1A2332;
+    --on-surface-variant: #4A5568;
+    --error: #BA1A1A;
+    --error-container: #FFDAD6;
+    --on-error-container: #410002;
+    --outline-variant: #C0C8BB;
+    --secondary-container: #CCE8C2;
+    --on-secondary-container: #102009;
+  }
+
+  * {
+    border-color: #C0C8BB;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-color: #F8F9FF;
+    color: #1A2332;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-feature-settings: "cv11", "ss01";
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Sora', system-ui, sans-serif;
+    letter-spacing: -0.02em;
+  }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #C0C8BB; border-radius: 9999px; }
+  ::-webkit-scrollbar-thumb:hover { background: #4A5568; }
+}
+
+@layer components {
+  .btn-primary {
+    background: linear-gradient(135deg, #006B58 0%, #00A68A 100%);
+    @apply text-white font-medium rounded-xl px-5 py-2.5 text-sm transition-all duration-200 inline-flex items-center gap-2;
+    @apply hover:opacity-90 hover:shadow-lg active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    background-color: #CCE8C2;
+    color: #102009;
+    @apply font-medium rounded-xl px-5 py-2.5 text-sm inline-flex items-center gap-2;
+    @apply transition-all duration-200 hover:brightness-95 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-ghost {
+    color: #006B58;
+    @apply font-medium px-4 py-2 text-sm rounded-lg inline-flex items-center gap-2;
+    @apply transition-all duration-200 hover:bg-[#E8EEF4] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .card {
+    background-color: #E8EEF4;
+    @apply rounded-xl p-5 transition-all duration-200;
+  }
+
+  .card-hover {
+    background-color: #E8EEF4;
+    @apply rounded-xl p-5 transition-all duration-200 hover:bg-white hover:shadow-lg cursor-pointer;
+  }
+
+  /* Status chips — all self-contained, no custom token classes */
+  .chip-inpatient {
+    background-color: #CCE8C2;
+    color: #102009;
+    @apply text-xs font-medium px-2.5 py-1 rounded-sm;
+  }
+
+  .chip-outpatient {
+    background-color: #FFDAD6;
+    color: #410002;
+    @apply text-xs font-medium px-2.5 py-1 rounded-sm;
+  }
+
+  .chip-active {
+    background-color: #CCE8C2;
+    color: #102009;
+    @apply text-xs font-medium px-2.5 py-1 rounded-sm;
+  }
+
+  .chip-pending {
+    @apply bg-amber-100 text-amber-800 text-xs font-medium px-2.5 py-1 rounded-sm;
+  }
+
+  .chip-cancelled {
+    background-color: #DCE4EC;
+    color: #4A5568;
+    @apply text-xs font-medium px-2.5 py-1 rounded-sm;
+  }
+
+  .chip-paid {
+    background-color: #CCE8C2;
+    color: #102009;
+    @apply text-xs font-medium px-2.5 py-1 rounded-sm;
+  }
+
+  .chip-unpaid {
+    background-color: #FFDAD6;
+    color: #410002;
+    @apply text-xs font-medium px-2.5 py-1 rounded-sm;
+  }
+
+  .input {
+    width: 100%;
+    background-color: #F0F4F8;
+    color: #1A2332;
+    @apply rounded-lg px-3 py-2.5 text-sm outline-none transition-all duration-150;
+    @apply placeholder:text-[#4A5568] focus:bg-[#E8EEF4] focus:ring-1 focus:ring-[#006B58]/30;
+  }
+
+  .glass {
+    background: rgba(248, 249, 255, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .progress-bar {
+    background: linear-gradient(135deg, #006B58 0%, #00A68A 100%);
+  }
+
+  .nav-item {
+    color: #4A5568;
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150;
+    @apply hover:bg-[#E8EEF4] hover:text-[#1A2332];
+  }
+
+  .nav-item-active {
+    background-color: #E8EEF4;
+    color: #006B58;
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium;
+  }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.page-enter {
+  animation: fadeUp 0.2s ease-out forwards;
+}
