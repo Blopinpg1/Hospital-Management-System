@@ -5,6 +5,7 @@ dist/
 securityaudit.md
 postman_tests.http
 
+
 # Env files
 .env.local
 .env.*.local
