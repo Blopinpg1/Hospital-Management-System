@@ -7,6 +7,7 @@ import {
   Cross, Menu, X
 } from 'lucide-react';
 import { useState } from 'react';
+import ToastContainer from '@/components/shared/ToastContainer';
 
 const navItems = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -113,6 +114,8 @@ export default function AppLayout() {
           <Outlet />
         </div>
       </main>
+
+      <ToastContainer />
     </div>
   );
 }
