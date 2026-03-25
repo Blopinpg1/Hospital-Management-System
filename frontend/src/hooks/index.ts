@@ -3,6 +3,12 @@ import {
   authApi, patientsApi, doctorsApi, departmentsApi,
   appointmentsApi, admissionsApi, clinicalApi, billingApi, inventoryApi,
 } from '@/api';
+import { toast } from '@/store/toast.store';
+
+const onErr = (err: unknown) => {
+  const msg = (err as any)?.response?.data?.message ?? 'Something went wrong.';
+  toast.error(msg);
+};
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
 export const useMe = () =>
@@ -10,30 +16,20 @@ export const useMe = () =>
 
 // ─── Patients ─────────────────────────────────────────────────────────────────
 export const usePatients = (params?: { page?: number; limit?: number; search?: string }) =>
-  useQuery({
-    queryKey: ['patients', params],
-    queryFn: () => patientsApi.list(params).then(r => r.data),
-  });
+  useQuery({ queryKey: ['patients', params], queryFn: () => patientsApi.list(params).then(r => r.data) });
 
 export const usePatient = (id: number) =>
-  useQuery({
-    queryKey: ['patient', id],
-    queryFn: () => patientsApi.get(id).then(r => r.data.data!),
-    enabled: !!id,
-  });
+  useQuery({ queryKey: ['patient', id], queryFn: () => patientsApi.get(id).then(r => r.data.data!), enabled: !!id });
 
 export const usePatientSummary = (id: number) =>
-  useQuery({
-    queryKey: ['patient-summary', id],
-    queryFn: () => patientsApi.summary(id).then(r => r.data.data!),
-    enabled: !!id,
-  });
+  useQuery({ queryKey: ['patient-summary', id], queryFn: () => patientsApi.summary(id).then(r => r.data.data!), enabled: !!id });
 
 export const useCreatePatient = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: patientsApi.create,
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['patients'] }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['patients'] }); toast.success('Patient registered successfully.'); },
+    onError: onErr,
   });
 };
 
@@ -41,10 +37,8 @@ export const useUpdatePatient = (id: number) => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (data: Parameters<typeof patientsApi.update>[1]) => patientsApi.update(id, data),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['patients'] });
-      qc.invalidateQueries({ queryKey: ['patient', id] });
-    },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['patients'] }); qc.invalidateQueries({ queryKey: ['patient', id] }); toast.success('Patient updated.'); },
+    onError: onErr,
   });
 };
 
@@ -53,18 +47,10 @@ export const useDoctors = () =>
   useQuery({ queryKey: ['doctors'], queryFn: () => doctorsApi.list().then(r => r.data.data!) });
 
 export const useDoctor = (id: number) =>
-  useQuery({
-    queryKey: ['doctor', id],
-    queryFn: () => doctorsApi.get(id).then(r => r.data.data!),
-    enabled: !!id,
-  });
+  useQuery({ queryKey: ['doctor', id], queryFn: () => doctorsApi.get(id).then(r => r.data.data!), enabled: !!id });
 
 export const useDoctorSchedule = (id: number) =>
-  useQuery({
-    queryKey: ['doctor-schedule', id],
-    queryFn: () => doctorsApi.schedule(id).then(r => r.data.data!),
-    enabled: !!id,
-  });
+  useQuery({ queryKey: ['doctor-schedule', id], queryFn: () => doctorsApi.schedule(id).then(r => r.data.data!), enabled: !!id });
 
 // ─── Departments ──────────────────────────────────────────────────────────────
 export const useDepartments = () =>
@@ -78,24 +64,17 @@ export const useUpcomingAppointments = (days = 7) =>
   useQuery({ queryKey: ['appointments', 'upcoming', days], queryFn: () => appointmentsApi.upcoming(days).then(r => r.data.data!) });
 
 export const useAppointmentsByDate = (date: string) =>
-  useQuery({
-    queryKey: ['appointments', 'by-date', date],
-    queryFn: () => appointmentsApi.byDate(date).then(r => r.data.data!),
-    enabled: !!date,
-  });
+  useQuery({ queryKey: ['appointments', 'by-date', date], queryFn: () => appointmentsApi.byDate(date).then(r => r.data.data!), enabled: !!date });
 
 export const useDoctorSlots = (doctor_id: number, date: string) =>
-  useQuery({
-    queryKey: ['doctor-slots', doctor_id, date],
-    queryFn: () => appointmentsApi.slots(doctor_id, date).then(r => r.data.data!),
-    enabled: !!doctor_id && !!date,
-  });
+  useQuery({ queryKey: ['doctor-slots', doctor_id, date], queryFn: () => appointmentsApi.slots(doctor_id, date).then(r => r.data.data!), enabled: !!doctor_id && !!date });
 
 export const useBookAppointment = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: appointmentsApi.book,
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['appointments'] }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['appointments'] }); toast.success('Appointment booked successfully.'); },
+    onError: onErr,
   });
 };
 
@@ -104,7 +83,8 @@ export const useUpdateAppointmentStatus = () => {
   return useMutation({
     mutationFn: ({ id, status, notes }: { id: number; status: string; notes?: string }) =>
       appointmentsApi.updateStatus(id, status, notes),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['appointments'] }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['appointments'] }); toast.success('Appointment status updated.'); },
+    onError: onErr,
   });
 };
 
@@ -132,7 +112,9 @@ export const useAdmitPatient = () => {
       qc.invalidateQueries({ queryKey: ['admissions'] });
       qc.invalidateQueries({ queryKey: ['bed-occupancy'] });
       qc.invalidateQueries({ queryKey: ['available-beds'] });
+      toast.success('Patient admitted successfully.');
     },
+    onError: onErr,
   });
 };
 
@@ -145,24 +127,18 @@ export const useDischargePatient = () => {
       qc.invalidateQueries({ queryKey: ['admissions'] });
       qc.invalidateQueries({ queryKey: ['bed-occupancy'] });
       qc.invalidateQueries({ queryKey: ['billing'] });
+      toast.success('Patient discharged and bill generated.');
     },
+    onError: onErr,
   });
 };
 
 // ─── Clinical ─────────────────────────────────────────────────────────────────
 export const useMedicalRecords = (patient_id: number) =>
-  useQuery({
-    queryKey: ['medical-records', patient_id],
-    queryFn: () => clinicalApi.records(patient_id).then(r => r.data.data!),
-    enabled: !!patient_id,
-  });
+  useQuery({ queryKey: ['medical-records', patient_id], queryFn: () => clinicalApi.records(patient_id).then(r => r.data.data!), enabled: !!patient_id });
 
 export const usePrescriptions = (patient_id: number) =>
-  useQuery({
-    queryKey: ['prescriptions', patient_id],
-    queryFn: () => clinicalApi.prescriptions(patient_id).then(r => r.data.data!),
-    enabled: !!patient_id,
-  });
+  useQuery({ queryKey: ['prescriptions', patient_id], queryFn: () => clinicalApi.prescriptions(patient_id).then(r => r.data.data!), enabled: !!patient_id });
 
 export const useLabTests = () =>
   useQuery({ queryKey: ['lab-tests'], queryFn: () => clinicalApi.labTests().then(r => r.data.data!) });
@@ -175,7 +151,8 @@ export const useUpdateLabResult = () => {
   return useMutation({
     mutationFn: ({ id, ...data }: { id: number; status: string; result_value?: string; result_date?: string; remarks?: string }) =>
       clinicalApi.updateLab(id, data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['lab-pending'] }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['lab-pending'] }); toast.success('Lab result updated.'); },
+    onError: onErr,
   });
 };
 
@@ -184,11 +161,7 @@ export const useBills = (params?: { page?: number; limit?: number }) =>
   useQuery({ queryKey: ['billing', params], queryFn: () => billingApi.bills(params).then(r => r.data) });
 
 export const useBill = (id: number) =>
-  useQuery({
-    queryKey: ['bill', id],
-    queryFn: () => billingApi.bill(id).then(r => r.data.data!),
-    enabled: !!id,
-  });
+  useQuery({ queryKey: ['bill', id], queryFn: () => billingApi.bill(id).then(r => r.data.data!), enabled: !!id });
 
 export const useOutstandingBills = () =>
   useQuery({ queryKey: ['billing', 'outstanding'], queryFn: () => billingApi.outstanding().then(r => r.data.data!) });
@@ -203,7 +176,8 @@ export const useCreateBill = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: billingApi.create,
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['billing'] }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['billing'] }); toast.success('Bill generated successfully.'); },
+    onError: onErr,
   });
 };
 
@@ -212,7 +186,8 @@ export const useMakePayment = () => {
   return useMutation({
     mutationFn: ({ id, ...data }: { id: number; amount: number; method: string; reference_no?: string }) =>
       billingApi.payment(id, data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['billing'] }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['billing'] }); toast.success('Payment recorded successfully.'); },
+    onError: onErr,
   });
 };
 
@@ -234,6 +209,8 @@ export const useUpdateStock = () => {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['medicines'] });
       qc.invalidateQueries({ queryKey: ['low-stock'] });
+      toast.success('Stock updated successfully.');
     },
+    onError: onErr,
   });
 };
